@@ -26,13 +26,18 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
     setError('');
 
     try {
+      console.log('[v0] Submitting registration with data:', formData);
+      
       const response = await fetch(`${API_BASE}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
+      console.log('[v0] Response status:', response.status);
+      
       const data = await response.json();
+      console.log('[v0] Response data:', data);
 
       if (data.success) {
         setGeneratedPin(data.pin);
@@ -41,8 +46,8 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
         setError(data.error || 'Registration failed');
       }
     } catch (err) {
-      setError('Error registering. Please try again.');
-      console.error(err);
+      console.error('[v0] Registration error:', err);
+      setError(`Error: ${err instanceof Error ? err.message : 'Unknown error'}. Make sure the backend is running at ${API_BASE}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -57,22 +62,22 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
 
   return (
     <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-card border border-border rounded-2xl max-w-2xl w-full shadow-xl">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
+      <div className="bg-card border border-border rounded-2xl max-w-2xl w-full shadow-xl max-h-[90vh] flex flex-col">
+        {/* Header - Fixed */}
+        <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
           <h2 className="text-2xl font-bold text-foreground">
             {step === 'form' ? 'Register Your Story' : 'Your Access PIN'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
+            className="p-2 hover:bg-muted rounded-lg transition-colors flex-shrink-0"
           >
             <X size={20} className="text-foreground/60" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-8">
+        {/* Content - Scrollable */}
+        <div className="p-8 overflow-y-auto flex-1">
           {error && (
             <div className="mb-4 p-4 bg-destructive/20 border border-destructive rounded-lg">
               <p className="text-sm text-foreground">{error}</p>

@@ -88,11 +88,8 @@ export default function PeopleDirectory() {
         {/* Section header */}
         <div className="text-center mb-16">
           <h2 className="text-5xl sm:text-6xl font-black mb-6 text-foreground">
-            Stories of Transformation
+            Listing
           </h2>
-          <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
-            Real developers, real transitions. From code to entrepreneurship, design, management, and beyond. Every journey matters.
-          </p>
         </div>
 
         {/* Filter tabs */}

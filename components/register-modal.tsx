@@ -7,6 +7,8 @@ interface RegisterModalProps {
   onClose: () => void;
 }
 
+const API_BASE = 'https://api.preciousadedokun.com.ng/iwasadev';
+
 export default function RegisterModal({ onClose }: RegisterModalProps) {
   const [step, setStep] = useState<'form' | 'pin'>('form');
   const [formData, setFormData] = useState({
@@ -15,14 +17,35 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
     after: '',
   });
   const [generatedPin, setGeneratedPin] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Generate a 6-digit PIN
-    const pin = Math.random().toString().slice(2, 8).padEnd(6, '0');
-    setGeneratedPin(pin);
-    setStep('pin');
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      const response = await fetch(`${API_BASE}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setGeneratedPin(data.pin);
+        setStep('pin');
+      } else {
+        setError(data.error || 'Registration failed');
+      }
+    } catch (err) {
+      setError('Error registering. Please try again.');
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (
@@ -50,6 +73,11 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
 
         {/* Content */}
         <div className="p-8">
+          {error && (
+            <div className="mb-4 p-4 bg-destructive/20 border border-destructive rounded-lg">
+              <p className="text-sm text-foreground">{error}</p>
+            </div>
+          )}
           {step === 'form' ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -103,9 +131,10 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all duration-300 transform hover:scale-105"
+                disabled={isSubmitting}
+                className="w-full py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Generate My PIN
+                {isSubmitting ? 'Registering...' : 'Generate My PIN'}
               </button>
             </form>
           ) : (

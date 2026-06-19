@@ -1,0 +1,59 @@
+{
+  "people": [
+    {
+      "id": "dev_001",
+      "name": "Sarah Chen",
+      "before": "Full-Stack Developer (10 yrs)",
+      "after": "Product Manager @ Tech Startup",
+      "pin": "$2y$10$placeholder1",
+      "created_at": "2024-01-15 10:30:00"
+    },
+    {
+      "id": "dev_002",
+      "name": "Marcus Johnson",
+      "before": "Backend Engineer",
+      "after": "Founder - SaaS Company",
+      "pin": "$2y$10$placeholder2",
+      "created_at": "2024-01-14 14:22:00"
+    },
+    {
+      "id": "dev_003",
+      "name": "Elena Rodriguez",
+      "before": "React Developer",
+      "after": "UX Designer & Design Lead",
+      "pin": "$2y$10$placeholder3",
+      "created_at": "2024-01-13 09:15:00"
+    },
+    {
+      "id": "dev_004",
+      "name": "David Kim",
+      "before": "DevOps Engineer",
+      "after": "Solutions Architect",
+      "pin": "$2y$10$placeholder4",
+      "created_at": "2024-01-12 16:45:00"
+    },
+    {
+      "id": "dev_005",
+      "name": "Sophie Laurent",
+      "before": "Frontend Developer",
+      "after": "Content Creator & Tech Writer",
+      "pin": "$2y$10$placeholder5",
+      "created_at": "2024-01-11 11:20:00"
+    },
+    {
+      "id": "dev_006",
+      "name": "James Wilson",
+      "before": "Senior Developer",
+      "after": "Business Consultant",
+      "pin": "$2y$10$placeholder6",
+      "created_at": "2024-01-10 13:50:00"
+    }
+  ],
+  "likes": [
+    {
+      "person_id": "dev_001",
+      "device": "device_hash_1",
+      "liked_at": "2024-01-15 10:35:00"
+    }
+  ]
+}

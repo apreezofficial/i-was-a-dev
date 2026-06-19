@@ -1,6 +1,7 @@
 'use client';
 
 import { Heart, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
 
 interface PersonCardProps {
   person: {
@@ -9,12 +10,34 @@ interface PersonCardProps {
     before: string;
     after: string;
     likes: number;
-    liked: boolean;
+    liked?: boolean;
   };
-  onLike: () => void;
+  onLike: (id: string) => Promise<void>;
 }
 
 export default function PersonCard({ person, onLike }: PersonCardProps) {
+  const [isLiking, setIsLiking] = useState(false);
+  const [currentLikes, setCurrentLikes] = useState(person.likes);
+  const [liked, setLiked] = useState(person.liked || false);
+
+  const handleLikeClick = async () => {
+    setIsLiking(true);
+    try {
+      await onLike(person.id);
+      if (liked) {
+        setCurrentLikes(prev => prev - 1);
+        setLiked(false);
+      } else {
+        setCurrentLikes(prev => prev + 1);
+        setLiked(true);
+      }
+    } catch (error) {
+      console.error('Error liking story:', error);
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
   return (
     <div className="group relative bg-card hover:bg-muted border border-border rounded-lg p-6 transition-all duration-300 hover:border-foreground/30 hover:shadow-md">
       <div className="relative z-10">
@@ -27,13 +50,14 @@ export default function PersonCard({ person, onLike }: PersonCardProps) {
             <h3 className="text-xl font-bold text-foreground">{person.name}</h3>
           </div>
           <button
-            onClick={onLike}
-            className="flex-shrink-0 p-2 rounded-full hover:bg-foreground/10 transition-colors"
+            onClick={handleLikeClick}
+            disabled={isLiking}
+            className="flex-shrink-0 p-2 rounded-full hover:bg-foreground/10 transition-colors disabled:opacity-50"
           >
             <Heart
               size={24}
               className={`transition-all duration-300 ${
-                person.liked
+                liked
                   ? 'fill-foreground stroke-foreground'
                   : 'stroke-foreground/40 hover:stroke-foreground'
               }`}
@@ -75,12 +99,12 @@ export default function PersonCard({ person, onLike }: PersonCardProps) {
           <div className="flex items-center gap-2">
             <Heart size={16} className="text-foreground" />
             <span className="text-sm font-semibold text-foreground/80">
-              {person.likes} {person.likes === 1 ? 'like' : 'likes'}
+              {currentLikes} {currentLikes === 1 ? 'like' : 'likes'}
             </span>
           </div>
-          <button className="text-xs font-bold text-foreground hover:text-foreground/70 transition-colors uppercase tracking-wider">
+          <a href={`/story/${person.id}`} className="text-xs font-bold text-foreground hover:text-foreground/70 transition-colors uppercase tracking-wider">
             Full Story →
-          </button>
+          </a>
         </div>
       </div>
     </div>

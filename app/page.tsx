@@ -38,6 +38,24 @@ export default function Home() {
       </section>
 
       <PeopleDirectory />
+      
+      {/* Footer */}
+      <footer className="border-t border-border bg-background py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-foreground/70 text-sm">
+            Built with love by{' '}
+            <a
+              href="https://preciousadedokun.com.ng"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-foreground hover:underline transition-colors"
+            >
+              Precious Adedokun
+            </a>
+          </p>
+        </div>
+      </footer>
+
       {showRegister && (
         <RegisterModal onClose={() => setShowRegister(false)} />
       )}

@@ -87,10 +87,8 @@ export default function PeopleDirectory() {
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
         <div className="text-center mb-16">
-          <h2 className="text-5xl sm:text-6xl font-black mb-6">
-            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Stories of Transformation
-            </span>
+          <h2 className="text-5xl sm:text-6xl font-black mb-6 text-foreground">
+            Stories of Transformation
           </h2>
           <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
             Real developers, real transitions. From code to entrepreneurship, design, management, and beyond. Every journey matters.
@@ -103,7 +101,7 @@ export default function PeopleDirectory() {
             (filter) => (
               <button
                 key={filter}
-                className="px-6 py-2 rounded-full border border-primary/50 text-sm font-semibold hover:bg-primary/10 transition-colors"
+                className="px-6 py-2 rounded-full border border-foreground/30 text-sm font-semibold hover:bg-foreground/5 transition-colors text-foreground"
               >
                 {filter}
               </button>

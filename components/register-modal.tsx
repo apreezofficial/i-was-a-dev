@@ -33,8 +33,8 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-card border border-border rounded-2xl max-w-2xl w-full shadow-2xl">
+    <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-card border border-border rounded-2xl max-w-2xl w-full shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-2xl font-bold text-foreground">
@@ -63,7 +63,7 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
                   onChange={handleInputChange}
                   required
                   placeholder="e.g., Sarah Chen"
-                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-foreground transition-all"
                 />
               </div>
 
@@ -78,7 +78,7 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
                   required
                   placeholder="e.g., Full-Stack Developer (10 years)"
                   rows={3}
-                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"
+                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-foreground transition-all resize-none"
                 />
               </div>
 
@@ -93,7 +93,7 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
                   required
                   placeholder="e.g., Product Manager at Tech Startup"
                   rows={3}
-                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"
+                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-foreground transition-all resize-none"
                 />
               </div>
 
@@ -103,7 +103,7 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-primary hover:bg-primary-dark text-primary-foreground font-bold rounded-lg transition-all duration-300 transform hover:scale-105"
+                className="w-full py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all duration-300 transform hover:scale-105"
               >
                 Generate My PIN
               </button>
@@ -117,11 +117,11 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
               </div>
 
               {/* PIN Display */}
-              <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/50 rounded-xl p-8 my-8">
+              <div className="bg-muted border border-border rounded-xl p-8 my-8">
                 <p className="text-sm font-semibold text-foreground/60 uppercase tracking-wider mb-2">
                   Your Access PIN
                 </p>
-                <p className="text-5xl font-black text-primary tracking-widest">
+                <p className="text-5xl font-black text-foreground tracking-widest">
                   {generatedPin}
                 </p>
               </div>
@@ -132,20 +132,20 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
                     navigator.clipboard.writeText(generatedPin);
                     alert('PIN copied to clipboard!');
                   }}
-                  className="w-full py-3 bg-accent/20 hover:bg-accent/30 text-accent font-bold rounded-lg transition-all border border-accent/50"
+                  className="w-full py-3 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-lg transition-all border border-border"
                 >
                   Copy PIN
                 </button>
                 <button
                   onClick={onClose}
-                  className="w-full py-3 bg-primary hover:bg-primary-dark text-primary-foreground font-bold rounded-lg transition-all"
+                  className="w-full py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all"
                 >
                   Done
                 </button>
               </div>
 
               <p className="text-xs text-foreground/50 italic">
-                🔒 Keep this PIN safe. You&apos;ll need it to access your profile.
+                Keep this PIN safe. You&apos;ll need it to access your profile.
               </p>
             </div>
           )}

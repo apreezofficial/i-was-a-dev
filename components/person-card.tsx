@@ -16,29 +16,26 @@ interface PersonCardProps {
 
 export default function PersonCard({ person, onLike }: PersonCardProps) {
   return (
-    <div className="group relative bg-card hover:bg-card/80 border border-border rounded-lg p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-xl">
-      {/* Background gradient on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 rounded-lg transition-opacity pointer-events-none"></div>
-
+    <div className="group relative bg-card hover:bg-muted border border-border rounded-lg p-6 transition-all duration-300 hover:border-foreground/30 hover:shadow-md">
       <div className="relative z-10">
         {/* Header with avatar placeholder and name */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full mb-3 flex items-center justify-center text-lg font-bold text-card">
+            <div className="w-12 h-12 bg-foreground rounded-full mb-3 flex items-center justify-center text-lg font-bold text-background">
               {person.name.charAt(0)}
             </div>
             <h3 className="text-xl font-bold text-foreground">{person.name}</h3>
           </div>
           <button
             onClick={onLike}
-            className="flex-shrink-0 p-2 rounded-full hover:bg-primary/10 transition-colors"
+            className="flex-shrink-0 p-2 rounded-full hover:bg-foreground/10 transition-colors"
           >
             <Heart
               size={24}
               className={`transition-all duration-300 ${
                 person.liked
-                  ? 'fill-primary stroke-primary'
-                  : 'stroke-foreground/50 hover:stroke-primary'
+                  ? 'fill-foreground stroke-foreground'
+                  : 'stroke-foreground/40 hover:stroke-foreground'
               }`}
             />
           </button>
@@ -56,17 +53,17 @@ export default function PersonCard({ person, onLike }: PersonCardProps) {
 
           {/* Arrow transition */}
           <div className="flex items-center justify-center py-2">
-            <div className="h-px flex-grow bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
-            <ArrowRight size={16} className="mx-2 text-primary/60" />
-            <div className="h-px flex-grow bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+            <div className="h-px flex-grow bg-foreground/20"></div>
+            <ArrowRight size={16} className="mx-2 text-foreground/40" />
+            <div className="h-px flex-grow bg-foreground/20"></div>
           </div>
 
           {/* After */}
           <div>
-            <p className="text-xs font-semibold text-accent uppercase tracking-wider mb-1">
+            <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-1">
               Now:
             </p>
-            <p className="text-sm font-bold text-accent">{person.after}</p>
+            <p className="text-sm font-bold text-foreground">{person.after}</p>
           </div>
         </div>
 
@@ -76,12 +73,12 @@ export default function PersonCard({ person, onLike }: PersonCardProps) {
         {/* Like count and view profile */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Heart size={16} className="text-primary" />
+            <Heart size={16} className="text-foreground" />
             <span className="text-sm font-semibold text-foreground/80">
               {person.likes} {person.likes === 1 ? 'like' : 'likes'}
             </span>
           </div>
-          <button className="text-xs font-bold text-primary hover:text-accent transition-colors uppercase tracking-wider">
+          <button className="text-xs font-bold text-foreground hover:text-foreground/70 transition-colors uppercase tracking-wider">
             Full Story →
           </button>
         </div>

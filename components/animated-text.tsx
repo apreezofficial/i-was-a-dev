@@ -7,7 +7,7 @@ interface AnimatedTextProps {
   interval?: number;
 }
 
-export default function AnimatedText({ words, interval = 3000 }: AnimatedTextProps) {
+export default function AnimatedText({ words, interval = 5000 }: AnimatedTextProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -19,25 +19,37 @@ export default function AnimatedText({ words, interval = 3000 }: AnimatedTextPro
   }, [words.length, interval]);
 
   return (
-    <span className="inline-block relative w-auto min-w-fit overflow-hidden">
+    <span className="inline relative align-baseline">
       <style>{`
-        @keyframes slideUp {
-          from { transform: translateY(0); opacity: 1; }
-          to { transform: translateY(-100%); opacity: 1; }
-        }
-        @keyframes slideDown {
-          from { transform: translateY(100%); opacity: 1; }
-          to { transform: translateY(0); opacity: 1; }
+        @keyframes spinFade {
+          0% { 
+            opacity: 1;
+            transform: rotateY(0deg) scale(1);
+          }
+          45% { 
+            opacity: 1;
+          }
+          50% { 
+            opacity: 0;
+            transform: rotateY(90deg) scale(0.8);
+          }
+          55% { 
+            opacity: 0;
+            transform: rotateY(-90deg) scale(0.8);
+          }
+          100% { 
+            opacity: 1;
+            transform: rotateY(0deg) scale(1);
+          }
         }
         .word-rotator {
           display: inline-block;
-          animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        .word-rotator.entering {
-          animation: slideDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          animation: spinFade 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          will-change: transform, opacity;
+          transform-style: preserve-3d;
         }
       `}</style>
-      <span key={currentIndex} className={`word-rotator ${currentIndex > 0 ? 'entering' : ''}`}>
+      <span key={currentIndex} className="word-rotator">
         {words[currentIndex]}
       </span>
     </span>

@@ -30,8 +30,8 @@ export default function Home() {
           <h2 className="text-6xl sm:text-7xl font-black text-foreground mb-4">
             iwasadev
           </h2>
-          <h3 className="text-2xl sm:text-3xl font-black text-foreground mb-2">
-            You stopped <AnimatedText words={animatedWords} interval={3000} />, that&apos;s okay
+          <h3 className="text-lg sm:text-xl font-black text-foreground mb-2">
+            You stopped <AnimatedText words={animatedWords} interval={5000} />, that&apos;s okay
           </h3>
           <p className="text-base sm:text-lg font-semibold text-foreground/80">
             Not registering yours is the crime

@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import PeopleDirectory from '@/components/people-directory';
 import RegisterModal from '@/components/register-modal';
+import AnimatedText from '@/components/animated-text';
 
 export default function Home() {
   const [showRegister, setShowRegister] = useState(false);
+  const animatedWords = ['coding', 'building', 'developing', 'creating', 'innovating'];
 
   return (
     <main className="bg-background text-foreground min-h-screen">
@@ -29,7 +31,7 @@ export default function Home() {
             iwasadev
           </h2>
           <p className="text-lg sm:text-xl font-semibold text-foreground mb-2">
-            Been an ex developer shouldn&apos;t be a stigma
+            You stopped <AnimatedText words={animatedWords} interval={2000} />, that&apos;s okay
           </p>
           <p className="text-base sm:text-lg font-semibold text-foreground/80">
             Not registering yours is the crime

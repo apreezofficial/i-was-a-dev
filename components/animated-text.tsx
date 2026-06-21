@@ -9,7 +9,6 @@ interface AnimatedTextProps {
 
 export default function AnimatedText({ words, interval = 3000 }: AnimatedTextProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(true);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -20,18 +19,27 @@ export default function AnimatedText({ words, interval = 3000 }: AnimatedTextPro
   }, [words.length, interval]);
 
   return (
-    <div className="inline-block relative h-[1.2em] overflow-hidden">
-      <div className="flex flex-col transition-transform duration-500 ease-in-out" 
-           style={{ 
-             transform: `translateY(-${currentIndex * 100}%)`,
-             transitionDuration: '500ms'
-           }}>
-        {words.map((word, index) => (
-          <div key={index} className="whitespace-nowrap">
-            {word}
-          </div>
-        ))}
-      </div>
-    </div>
+    <span className="inline-block relative w-auto min-w-fit overflow-hidden">
+      <style>{`
+        @keyframes slideUp {
+          from { transform: translateY(0); opacity: 1; }
+          to { transform: translateY(-100%); opacity: 1; }
+        }
+        @keyframes slideDown {
+          from { transform: translateY(100%); opacity: 1; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        .word-rotator {
+          display: inline-block;
+          animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .word-rotator.entering {
+          animation: slideDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+      `}</style>
+      <span key={currentIndex} className={`word-rotator ${currentIndex > 0 ? 'entering' : ''}`}>
+        {words[currentIndex]}
+      </span>
+    </span>
   );
 }

@@ -59,6 +59,15 @@ switch ($action) {
     case 'check-like':
         handleCheckLike();
         break;
+    case 'login':
+        handleLogin();
+        break;
+    case 'update-profile':
+        handleUpdateProfile();
+        break;
+    case 'save-story':
+        handleSaveStory();
+        break;
     default:
         http_response_code(404);
         echo json_encode(['error' => 'Endpoint not found']);
@@ -263,5 +272,114 @@ function handleCheckLike() {
     }
     
     echo json_encode(['liked' => false]);
+}
+
+// Login handler
+function handleLogin() {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $pin = $input['pin'] ?? null;
+    
+    if (!$pin) {
+        http_response_code(400);
+        echo json_encode(['error' => 'PIN is required']);
+        return;
+    }
+    
+    $data = readData();
+    
+    foreach ($data['people'] as $person) {
+        if ($person['pin'] === $pin) {
+            // Return user data
+            echo json_encode([
+                'success' => true,
+                'user' => [
+                    'id' => $person['id'],
+                    'name' => $person['name'],
+                    'before' => $person['before'],
+                    'after' => $person['after'] ?? '',
+                    'pin' => $pin,
+                    'reason_for_leaving' => $person['reason_for_leaving'] ?? '',
+                    'story' => $person['story'] ?? '',
+                ]
+            ]);
+            return;
+        }
+    }
+    
+    http_response_code(401);
+    echo json_encode(['error' => 'Invalid PIN']);
+}
+
+// Update profile handler
+function handleUpdateProfile() {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $pin = $input['pin'] ?? null;
+    $reasonForLeaving = $input['reason_for_leaving'] ?? '';
+    $currentRole = $input['current_role'] ?? '';
+    
+    if (!$pin) {
+        http_response_code(400);
+        echo json_encode(['error' => 'PIN is required']);
+        return;
+    }
+    
+    $data = readData();
+    
+    foreach ($data['people'] as &$person) {
+        if ($person['pin'] === $pin) {
+            $person['reason_for_leaving'] = $reasonForLeaving;
+            $person['after'] = $currentRole;
+            writeData($data);
+            
+            echo json_encode([
+                'success' => true,
+                'message' => 'Profile updated successfully'
+            ]);
+            return;
+        }
+    }
+    
+    http_response_code(401);
+    echo json_encode(['error' => 'Invalid PIN']);
+}
+
+// Save story handler
+function handleSaveStory() {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $pin = $input['pin'] ?? null;
+    $story = $input['story'] ?? '';
+    $images = $input['images'] ?? [];
+    
+    if (!$pin) {
+        http_response_code(400);
+        echo json_encode(['error' => 'PIN is required']);
+        return;
+    }
+    
+    if (!$story) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Story is required']);
+        return;
+    }
+    
+    $data = readData();
+    
+    foreach ($data['people'] as &$person) {
+        if ($person['pin'] === $pin) {
+            $person['story'] = $story;
+            $person['images'] = $images;
+            $person['updated_at'] = date('Y-m-d H:i:s');
+            writeData($data);
+            
+            echo json_encode([
+                'success' => true,
+                'message' => 'Story saved successfully'
+            ]);
+            return;
+        }
+    }
+    
+    http_response_code(401);
+    echo json_encode(['error' => 'Invalid PIN']);
 }
 ?>

@@ -157,8 +157,8 @@ export default function StoryPage({ params }: { params: { id: string } }) {
                       onClick={handleLike}
                       disabled={isLiking}
                       className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-black transition-all ${liked
-                          ? 'bg-primary text-primary-foreground scale-105'
-                          : 'bg-muted border border-border text-foreground hover:border-primary/50'
+                        ? 'bg-primary text-primary-foreground scale-105'
+                        : 'bg-muted border border-border text-foreground hover:border-primary/50'
                         }`}
                     >
                       <Heart size={20} className={liked ? 'fill-current' : ''} />
@@ -208,9 +208,21 @@ export default function StoryPage({ params }: { params: { id: string } }) {
                 <div className="prose prose-invert max-w-none">
                   {story.story ? (
                     <div className="text-xl sm:text-2xl font-medium text-foreground/90 leading-relaxed space-y-6">
-                      {story.story.split('\n').map((para, i) => (
-                        <p key={i}>{para}</p>
-                      ))}
+                      {story.story.split('\n').map((line, i) => {
+                        // Simple Markdown Fallback
+                        if (line.startsWith('# '))
+                          return <h1 key={i} className="text-4xl font-black mb-6 mt-8 text-foreground">{line.replace('# ', '')}</h1>;
+                        if (line.startsWith('## '))
+                          return <h2 key={i} className="text-3xl font-black mb-4 mt-6 text-foreground/90">{line.replace('## ', '')}</h2>;
+                        if (line.startsWith('### '))
+                          return <h3 key={i} className="text-2xl font-black mb-3 mt-4 text-foreground/80">{line.replace('### ', '')}</h3>;
+                        if (line.startsWith('> '))
+                          return <blockquote key={i} className="border-l-4 border-primary pl-6 italic my-8 text-foreground/60 bg-primary/5 py-4 rounded-r-xl">{line.replace('> ', '')}</blockquote>;
+                        if (line.startsWith('- '))
+                          return <li key={i} className="ml-6 mb-2 list-disc">{line.replace('- ', '')}</li>;
+
+                        return line.trim() === '' ? <div key={i} className="h-4" /> : <p key={i}>{line}</p>;
+                      })}
                     </div>
                   ) : (
                     <div className="text-center py-12">

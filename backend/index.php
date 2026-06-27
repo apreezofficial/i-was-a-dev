@@ -82,30 +82,36 @@ function handleLogin() {
     }
     
     $input = json_decode(file_get_contents('php://input'), true);
-    $name = isset($input['name']) ? trim($input['name']) : null;
     $pin = isset($input['pin']) ? trim($input['pin']) : null;
     
-    if (!$name || !$pin) {
+    if (!$pin) {
         http_response_code(400);
-        echo json_encode(['error' => 'Name and PIN are required']);
+        echo json_encode(['error' => 'PIN is required']);
         return;
     }
     
     $data = readData();
     foreach ($data['people'] as $person) {
-        if (strtolower($person['name']) === strtolower($name)) {
-            if (password_verify($pin, $person['pin'])) {
-                // Return person data without PIN
-                $safePerson = $person;
-                unset($safePerson['pin']);
-                echo json_encode(['success' => true, 'data' => $safePerson]);
-                return;
+        if (password_verify($pin, $person['pin'])) {
+            // Count likes
+            $likeCount = 0;
+            foreach ($data['likes'] as $like) {
+                if ($like['person_id'] === $person['id']) {
+                    $likeCount++;
+                }
             }
+            $person['likes'] = $likeCount;
+            
+            // Return person data without PIN
+            $safePerson = $person;
+            unset($safePerson['pin']);
+            echo json_encode(['success' => true, 'data' => $safePerson]);
+            return;
         }
     }
     
     http_response_code(401);
-    echo json_encode(['error' => 'Invalid name or PIN']);
+    echo json_encode(['error' => 'Invalid PIN']);
 }
 
 // Update profile handle
@@ -133,10 +139,19 @@ function handleUpdateProfile() {
                 if (isset($input['name'])) $person['name'] = htmlspecialchars($input['name']);
                 if (isset($input['before'])) $person['before'] = htmlspecialchars($input['before']);
                 if (isset($input['after'])) $person['after'] = htmlspecialchars($input['after']);
-                if (isset($input['story'])) $person['story'] = htmlspecialchars($input['story']);
+                if (isset($input['story'])) $person['story'] = $input['story']; // Allow raw story for markdown
                 if (isset($input['avatar'])) $person['avatar'] = $input['avatar'];
                 
                 writeData($data);
+                
+                // Count likes
+                $likeCount = 0;
+                foreach ($data['likes'] as $like) {
+                    if ($like['person_id'] === $person['id']) {
+                        $likeCount++;
+                    }
+                }
+                $person['likes'] = $likeCount;
                 
                 $safePerson = $person;
                 unset($safePerson['pin']);

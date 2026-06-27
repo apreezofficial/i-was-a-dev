@@ -54,7 +54,7 @@ export default function PeopleDirectory() {
 
         setPeople(newPeople);
         const newPagination = {
-          total: data.pagination.total,
+          total: Math.max(data.pagination.total, newPeople.length),
           totalPages: data.pagination.total_pages,
           limit: data.pagination.limit
         };

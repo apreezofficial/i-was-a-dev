@@ -26,6 +26,7 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState<any>(null);
+  const [storyView, setStoryView] = useState<'edit' | 'preview'>('edit');
 
   useEffect(() => {
     const savedUser = localStorage.getItem('iwasadev_user');
@@ -64,7 +65,7 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
       const endpoint = authMode === 'register' ? 'register' : 'login';
       const body = authMode === 'register'
         ? { name: formData.name, before: formData.before, after: formData.after, story: formData.story, avatar }
-        : { name: formData.name, pin: formData.pin };
+        : { pin: formData.pin };
 
       const response = await fetch(`${API_BASE}/${endpoint}`, {
         method: 'POST',
@@ -117,7 +118,6 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
       });
 
       const data = await response.json();
-
       if (data.success) {
         localStorage.setItem('iwasadev_user', JSON.stringify(data.data));
         setUser(data.data);
@@ -131,6 +131,27 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const insertMarkdown = (prefix: string, suffix: string = '') => {
+    const textarea = document.getElementsByName('story')[0] as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const after = text.substring(end, text.length);
+    const selection = text.substring(start, end);
+
+    const newValue = before + prefix + selection + suffix + after;
+    setFormData(prev => ({ ...prev, story: newValue }));
+
+    // Reset focus and selection
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, end + prefix.length);
+    }, 0);
   };
 
   const handleInputChange = (
@@ -200,20 +221,22 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
               </div>
 
               <form onSubmit={handleAuth} className="space-y-6">
-                <div>
-                  <label className="block text-xs font-black text-foreground/40 mb-2 uppercase tracking-widest">
-                    Your Full Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="e.g., Sarah Chen"
-                    className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
-                  />
-                </div>
+                {authMode === 'register' && (
+                  <div>
+                    <label className="block text-xs font-black text-foreground/40 mb-2 uppercase tracking-widest">
+                      Your Full Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="e.g., Sarah Chen"
+                      className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
+                    />
+                  </div>
+                )}
 
                 {authMode === 'register' ? (
                   <>
@@ -411,20 +434,78 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
                   </div>
 
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="block text-xs font-black text-foreground/40 uppercase tracking-widest">
-                        Long Story
-                      </label>
-                      <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded font-black uppercase">Storytelling Mode</span>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
+                        <button
+                          type="button"
+                          onClick={() => setStoryView('edit')}
+                          className={`px-4 py-1.5 rounded-md text-xs font-black transition-all ${storyView === 'edit' ? 'bg-card text-foreground shadow-sm' : 'text-foreground/40 hover:text-foreground'}`}
+                        >
+                          EDIT
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setStoryView('preview')}
+                          className={`px-4 py-1.5 rounded-md text-xs font-black transition-all ${storyView === 'preview' ? 'bg-card text-foreground shadow-sm' : 'text-foreground/40 hover:text-foreground'}`}
+                        >
+                          PREVIEW
+                        </button>
+                      </div>
+                      <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded font-black uppercase">Markdown Supported</span>
                     </div>
-                    <textarea
-                      name="story"
-                      value={formData.story}
-                      onChange={handleInputChange}
-                      placeholder="Write your full transition story here... what made you quit? what's the best part about your new life?"
-                      rows={6}
-                      className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium resize-none leading-relaxed"
-                    />
+
+                    {storyView === 'edit' ? (
+                      <div className="space-y-4">
+                        {/* Markdown Toolbar */}
+                        <div className="flex flex-wrap gap-2 pb-2">
+                          {[
+                            { label: 'B', prefix: '**', suffix: '**', title: 'Bold' },
+                            { label: 'I', prefix: '*', suffix: '*', title: 'Italic' },
+                            { label: 'H1', prefix: '# ', suffix: '', title: 'Heading 1' },
+                            { label: 'H2', prefix: '## ', suffix: '', title: 'Heading 2' },
+                            { label: 'Quote', prefix: '> ', suffix: '', title: 'Quote' },
+                            { label: 'Link', prefix: '[', suffix: '](url)', title: 'Link' },
+                            { label: 'List', prefix: '- ', suffix: '', title: 'Bullet List' },
+                          ].map((tool) => (
+                            <button
+                              key={tool.title}
+                              type="button"
+                              onClick={() => insertMarkdown(tool.prefix, tool.suffix)}
+                              className="px-3 py-1 bg-muted hover:bg-border rounded text-[10px] font-black border border-border/50 text-foreground/60 transition-colors"
+                              title={tool.title}
+                            >
+                              {tool.label}
+                            </button>
+                          ))}
+                        </div>
+                        <textarea
+                          name="story"
+                          value={formData.story}
+                          onChange={handleInputChange}
+                          placeholder="Write your full transition story here... what made you quit? what's the best part about your new life? # Markdown is on!"
+                          rows={10}
+                          className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium resize-none leading-relaxed font-mono text-sm"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full px-6 py-6 bg-muted/50 border border-border rounded-xl min-h-[250px] max-h-[400px] overflow-y-auto">
+                        {formData.story ? (
+                          <div className="prose prose-invert prose-sm max-w-none">
+                            {/* Simple fallback markdown rendering if react-markdown isn't ready */}
+                            <div className="text-foreground/90 whitespace-pre-wrap font-medium leading-relaxed">
+                              {formData.story.split('\n').map((line, i) => {
+                                if (line.startsWith('# ')) return <h1 key={i} className="text-2xl font-black mb-4 mt-2">{line.replace('# ', '')}</h1>;
+                                if (line.startsWith('## ')) return <h2 key={i} className="text-xl font-black mb-3 mt-2">{line.replace('## ', '')}</h2>;
+                                if (line.startsWith('> ')) return <blockquote key={i} className="border-l-4 border-primary pl-4 italic my-4 text-foreground/60">{line.replace('> ', '')}</blockquote>;
+                                return <p key={i} className={line.trim() === '' ? 'h-4' : 'mb-2'}>{line}</p>;
+                              })}
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-foreground/20 italic text-center py-12">Nothing to preview yet...</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 

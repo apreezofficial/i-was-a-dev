@@ -224,9 +224,9 @@ function handleGetAll() {
 
     $data = readData();
     
-    // Sort people by creation date (newest first)
+    // Sort people by creation date (oldest first)
     usort($data['people'], function($a, $b) {
-        return strtotime($b['created_at']) - strtotime($a['created_at']);
+        return strtotime($a['created_at']) - strtotime($b['created_at']);
     });
 
     $total = count($data['people']);

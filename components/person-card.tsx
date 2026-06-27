@@ -9,6 +9,7 @@ interface PersonCardProps {
     name: string;
     before: string;
     after: string;
+    avatar?: string;
     likes: number;
     liked?: boolean;
   };
@@ -41,11 +42,15 @@ export default function PersonCard({ person, onLike }: PersonCardProps) {
   return (
     <div className="group relative bg-card hover:bg-muted border border-border rounded-lg p-6 transition-all duration-300 hover:border-foreground/30 hover:shadow-md">
       <div className="relative z-10">
-        {/* Header with avatar placeholder and name */}
+        {/* Header with avatar and name */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1">
-            <div className="w-12 h-12 bg-foreground rounded-full mb-3 flex items-center justify-center text-lg font-bold text-background">
-              {person.name.charAt(0)}
+            <div className="w-12 h-12 bg-foreground rounded-full mb-3 flex items-center justify-center text-lg font-bold text-background overflow-hidden border border-border">
+              {person.avatar ? (
+                <img src={person.avatar} alt={person.name} className="w-full h-full object-cover" />
+              ) : (
+                person.name.charAt(0)
+              )}
             </div>
             <h3 className="text-xl font-bold text-foreground">{person.name}</h3>
           </div>
@@ -56,11 +61,10 @@ export default function PersonCard({ person, onLike }: PersonCardProps) {
           >
             <Heart
               size={24}
-              className={`transition-all duration-300 ${
-                liked
+              className={`transition-all duration-300 ${liked
                   ? 'fill-foreground stroke-foreground'
                   : 'stroke-foreground/40 hover:stroke-foreground'
-              }`}
+                }`}
             />
           </button>
         </div>

@@ -1,53 +1,133 @@
 'use client';
 
-import { useState } from 'react';
-import { X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Camera, Save, LogOut, Loader2, Sparkles, User, MessageSquareText, Award } from 'lucide-react';
 
 interface RegisterModalProps {
+  mode?: 'register' | 'login';
   onClose: () => void;
+  onSuccess?: (user: any) => void;
 }
 
 const API_BASE = 'https://api.preciousadedokun.com.ng/iwasadev';
 
-export default function RegisterModal({ onClose }: RegisterModalProps) {
-  const [step, setStep] = useState<'form' | 'pin'>('form');
+export default function RegisterModal({ mode = 'register', onClose, onSuccess }: RegisterModalProps) {
+  const [currentStep, setCurrentStep] = useState<'form' | 'pin' | 'dashboard'>(mode === 'login' && typeof window !== 'undefined' && localStorage.getItem('iwasadev_user') ? 'dashboard' : 'form');
+  const [authMode, setAuthMode] = useState<'register' | 'login'>(mode);
   const [formData, setFormData] = useState({
     name: '',
     before: '',
     after: '',
+    story: '',
+    pin: '',
   });
+  const [avatar, setAvatar] = useState<string | null>(null);
   const [generatedPin, setGeneratedPin] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [user, setUser] = useState<any>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    const savedUser = localStorage.getItem('iwasadev_user');
+    if (savedUser && mode === 'login') {
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+      setFormData({
+        name: parsedUser.name || '',
+        before: parsedUser.before || '',
+        after: parsedUser.after || '',
+        story: parsedUser.story || '',
+        pin: localStorage.getItem('iwasadev_pin') || '',
+      });
+      setAvatar(parsedUser.avatar || null);
+      setCurrentStep('dashboard');
+    }
+  }, [mode]);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
 
     try {
-      console.log('[v0] Submitting registration with data:', formData);
-      
-      const response = await fetch(`${API_BASE}/register`, {
+      const endpoint = authMode === 'register' ? 'register' : 'login';
+      const body = authMode === 'register'
+        ? { name: formData.name, before: formData.before, after: formData.after, story: formData.story, avatar }
+        : { name: formData.name, pin: formData.pin };
+
+      const response = await fetch(`${API_BASE}/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(body),
       });
 
-      console.log('[v0] Response status:', response.status);
-      
       const data = await response.json();
-      console.log('[v0] Response data:', data);
 
       if (data.success) {
-        setGeneratedPin(data.pin);
-        setStep('pin');
+        if (authMode === 'register') {
+          setGeneratedPin(data.pin);
+          setCurrentStep('pin');
+          // Save a temporary session if registration is successful? 
+          // Actually, usually user will login with the PIN first.
+        } else {
+          // Login successful
+          localStorage.setItem('iwasadev_user', JSON.stringify(data.data));
+          localStorage.setItem('iwasadev_pin', formData.pin);
+          setUser(data.data);
+          onSuccess?.(data.data);
+          setCurrentStep('dashboard');
+        }
       } else {
-        setError(data.error || 'Registration failed');
+        setError(data.error || 'Operation failed');
       }
     } catch (err) {
-      console.error('[v0] Registration error:', err);
-      setError(`Error: ${err instanceof Error ? err.message : 'Unknown error'}. Make sure the backend is running at ${API_BASE}`);
+      setError(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      const pin = localStorage.getItem('iwasadev_pin');
+      const response = await fetch(`${API_BASE}/update-profile`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: user.id,
+          pin,
+          ...formData,
+          avatar
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem('iwasadev_user', JSON.stringify(data.data));
+        setUser(data.data);
+        onSuccess?.(data.data);
+        alert('Profile updated successfully!');
+      } else {
+        setError(data.error || 'Update failed');
+      }
+    } catch (err) {
+      setError(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -60,127 +140,316 @@ export default function RegisterModal({ onClose }: RegisterModalProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const renderHeader = () => {
+    let title = '';
+    if (currentStep === 'dashboard') title = 'My Dashboard';
+    else if (currentStep === 'pin') title = 'Your Access PIN';
+    else title = authMode === 'register' ? 'Register Your Story' : 'Welcome Back';
+
+    return (
+      <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">
+            {title}
+          </h2>
+          {currentStep === 'form' && (
+            <p className="text-sm text-foreground/50 font-medium">
+              {authMode === 'register' ? "Share your journey with the community" : "Enter your details to manage your story"}
+            </p>
+          )}
+        </div>
+        <button
+          onClick={onClose}
+          className="p-2 hover:bg-muted rounded-lg transition-colors flex-shrink-0"
+        >
+          <X size={20} className="text-foreground/60" />
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-card border border-border rounded-2xl max-w-2xl w-full shadow-xl max-h-[90vh] flex flex-col">
-        {/* Header - Fixed */}
-        <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
-          <h2 className="text-2xl font-bold text-foreground">
-            {step === 'form' ? 'Register Your Story' : 'Your Access PIN'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-muted rounded-lg transition-colors flex-shrink-0"
-          >
-            <X size={20} className="text-foreground/60" />
-          </button>
-        </div>
+      <div className="bg-card border border-border rounded-2xl max-w-2xl w-full shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
+        {renderHeader()}
 
-        {/* Content - Scrollable */}
         <div className="p-8 overflow-y-auto flex-1">
           {error && (
-            <div className="mb-4 p-4 bg-destructive/20 border border-destructive rounded-lg">
-              <p className="text-sm text-foreground">{error}</p>
+            <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-xl flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
+              <p className="text-sm font-semibold text-destructive">{error}</p>
             </div>
           )}
-          {step === 'form' ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-bold text-foreground mb-2 uppercase tracking-wide">
-                  Your Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="e.g., Sarah Chen"
-                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-foreground transition-all"
-                />
+
+          {currentStep === 'form' && (
+            <div className="space-y-8">
+              {/* Auth Tabs */}
+              <div className="flex p-1 bg-muted rounded-xl gap-1">
+                <button
+                  onClick={() => setAuthMode('register')}
+                  className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm transition-all ${authMode === 'register' ? 'bg-card text-foreground shadow-sm' : 'text-foreground/50 hover:text-foreground'}`}
+                >
+                  Register
+                </button>
+                <button
+                  onClick={() => setAuthMode('login')}
+                  className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm transition-all ${authMode === 'login' ? 'bg-card text-foreground shadow-sm' : 'text-foreground/50 hover:text-foreground'}`}
+                >
+                  Login
+                </button>
+              </div>
+
+              <form onSubmit={handleAuth} className="space-y-6">
+                <div>
+                  <label className="block text-xs font-black text-foreground/40 mb-2 uppercase tracking-widest">
+                    Your Full Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="e.g., Sarah Chen"
+                    className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
+                  />
+                </div>
+
+                {authMode === 'register' ? (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-black text-foreground/40 mb-2 uppercase tracking-widest">
+                          Was (Dev Role)
+                        </label>
+                        <textarea
+                          name="before"
+                          value={formData.before}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="e.g., Senior Frontend dev"
+                          rows={2}
+                          className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium resize-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black text-foreground/40 mb-2 uppercase tracking-widest">
+                          Now (Current Role)
+                        </label>
+                        <textarea
+                          name="after"
+                          value={formData.after}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="e.g., Product Manager"
+                          rows={2}
+                          className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium resize-none"
+                        />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <label className="block text-xs font-black text-foreground/40 mb-2 uppercase tracking-widest">
+                      Access PIN
+                    </label>
+                    <input
+                      type="password"
+                      name="pin"
+                      value={formData.pin}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="Enter your 6-digit PIN"
+                      maxLength={6}
+                      className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-black tracking-widest text-center text-xl"
+                    />
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg shadow-primary/20 active:scale-[0.98]"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="animate-spin" size={20} />
+                  ) : authMode === 'register' ? (
+                    <>
+                      <span>Start Your Journey</span>
+                      <Sparkles size={18} className="group-hover:rotate-12 transition-transform" />
+                    </>
+                  ) : (
+                    <span>Login to Dashboard</span>
+                  )}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {currentStep === 'pin' && (
+            <div className="space-y-8 text-center py-4">
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Award size={40} className="text-primary" />
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-foreground mb-2 uppercase tracking-wide">
-                  What You Were (Your Dev Role)
-                </label>
-                <textarea
-                  name="before"
-                  value={formData.before}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="e.g., Full-Stack Developer (10 years)"
-                  rows={3}
-                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-foreground transition-all resize-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-foreground mb-2 uppercase tracking-wide">
-                  What You Do Now (Current Role)
-                </label>
-                <textarea
-                  name="after"
-                  value={formData.after}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="e.g., Product Manager at Tech Startup"
-                  rows={3}
-                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-foreground transition-all resize-none"
-                />
-              </div>
-
-              <p className="text-sm text-foreground/60 italic">
-                After submission, you&apos;ll receive a PIN to log in and manage your profile anytime.
-              </p>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Registering...' : 'Generate My PIN'}
-              </button>
-            </form>
-          ) : (
-            <div className="space-y-6 text-center">
-              <div>
-                <p className="text-foreground/70 mb-4">
-                  Your story has been registered! Save this PIN to login anytime.
+                <h3 className="text-xl font-bold text-foreground mb-2">Welcome to the Community!</h3>
+                <p className="text-foreground/60">
+                  Your story has been registered. Save this PIN to access your dashboard anytime.
                 </p>
               </div>
 
-              {/* PIN Display */}
-              <div className="bg-muted border border-border rounded-xl p-8 my-8">
-                <p className="text-sm font-semibold text-foreground/60 uppercase tracking-wider mb-2">
-                  Your Access PIN
+              <div className="bg-muted border-2 border-dashed border-border rounded-2xl p-10 relative overflow-hidden group">
+                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <p className="text-xs font-black text-foreground/30 uppercase tracking-[0.2em] mb-4">
+                  Access PIN
                 </p>
-                <p className="text-5xl font-black text-foreground tracking-widest">
+                <p className="text-6xl font-black text-foreground tracking-[0.3em]">
                   {generatedPin}
                 </p>
               </div>
 
-              <div className="space-y-3">
+              <div className="flex flex-col gap-3">
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(generatedPin);
                     alert('PIN copied to clipboard!');
                   }}
-                  className="w-full py-3 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-lg transition-all border border-border"
+                  className="w-full py-4 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-xl transition-all border border-border"
                 >
                   Copy PIN
                 </button>
                 <button
-                  onClick={onClose}
-                  className="w-full py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all"
+                  onClick={() => {
+                    setAuthMode('login');
+                    setFormData({ ...formData, pin: generatedPin });
+                    setCurrentStep('form');
+                  }}
+                  className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-xl transition-all"
                 >
-                  Done
+                  Continue to Login
                 </button>
               </div>
+            </div>
+          )}
 
-              <p className="text-xs text-foreground/50 italic">
-                Keep this PIN safe. You&apos;ll need it to access your profile.
-              </p>
+          {currentStep === 'dashboard' && user && (
+            <div className="space-y-8">
+              {/* Stats / Dashboard Overview */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-muted p-4 rounded-2xl border border-border/50">
+                  <p className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-1">Total Likes</p>
+                  <p className="text-3xl font-black text-foreground">{user.likes || 0}</p>
+                </div>
+                <div className="bg-muted p-4 rounded-2xl border border-border/50">
+                  <p className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-1">Status</p>
+                  <p className="text-3xl font-black text-primary">Live</p>
+                </div>
+              </div>
+
+              <form onSubmit={handleUpdate} className="space-y-6">
+                {/* Avatar Upload */}
+                <div className="flex flex-col items-center gap-4">
+                  <div className="relative group">
+                    <div className="w-24 h-24 rounded-full bg-muted border-2 border-border overflow-hidden flex items-center justify-center">
+                      {avatar ? (
+                        <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <User size={32} className="text-foreground/20" />
+                      )}
+                    </div>
+                    <label className="absolute inset-0 flex items-center justify-center bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full cursor-pointer">
+                      <Camera className="text-background" size={24} />
+                      <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+                    </label>
+                  </div>
+                  <p className="text-xs font-bold text-foreground/50 uppercase tracking-widest">Update Profile Picture</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-black text-foreground/40 mb-2 uppercase tracking-widest">
+                      Display Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-black text-foreground/40 mb-2 uppercase tracking-widest">
+                        Was
+                      </label>
+                      <input
+                        type="text"
+                        name="before"
+                        value={formData.before}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-black text-foreground/40 mb-2 uppercase tracking-widest">
+                        Now
+                      </label>
+                      <input
+                        type="text"
+                        name="after"
+                        value={formData.after}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-xs font-black text-foreground/40 uppercase tracking-widest">
+                        Long Story
+                      </label>
+                      <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded font-black uppercase">Storytelling Mode</span>
+                    </div>
+                    <textarea
+                      name="story"
+                      value={formData.story}
+                      onChange={handleInputChange}
+                      placeholder="Write your full transition story here... what made you quit? what's the best part about your new life?"
+                      rows={6}
+                      className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium resize-none leading-relaxed"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
+                  >
+                    {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
+                    <span>Save Changes</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}/story/${user.id}`;
+                      navigator.clipboard.writeText(shareUrl);
+                      alert('Story link copied to clipboard!');
+                    }}
+                    className="px-6 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-xl border border-border transition-all flex items-center justify-center"
+                  >
+                    Share
+                  </button>
+                </div>
+              </form>
             </div>
           )}
         </div>

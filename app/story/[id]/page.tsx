@@ -9,6 +9,8 @@ interface Story {
   name: string;
   before: string;
   after: string;
+  story: string;
+  avatar: string;
   likes: number;
   created_at: string;
 }
@@ -80,7 +82,10 @@ export default function StoryPage({ params }: { params: { id: string } }) {
   if (loading) {
     return (
       <main className="bg-background text-foreground min-h-screen flex items-center justify-center">
-        <p className="text-foreground/60">Loading...</p>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-foreground/60 font-bold animate-pulse">Loading Story...</p>
+        </div>
       </main>
     );
   }
@@ -90,14 +95,18 @@ export default function StoryPage({ params }: { params: { id: string } }) {
       <main className="bg-background text-foreground min-h-screen">
         <header className="border-b border-border sticky top-0 bg-background z-40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <Link href="/" className="flex items-center gap-2 text-foreground hover:text-foreground/70">
+            <Link href="/" className="flex items-center gap-2 text-foreground hover:text-foreground/70 transition-colors">
               <ArrowLeft size={20} />
-              Back to Listing
+              Back to Home
             </Link>
           </div>
         </header>
-        <div className="flex items-center justify-center py-20">
-          <p className="text-foreground/60">{error || 'Story not found'}</p>
+        <div className="flex flex-col items-center justify-center py-24 text-center px-4">
+          <h2 className="text-4xl font-black mb-4">404</h2>
+          <p className="text-xl text-foreground/60 mb-8">{error || 'Story not found'}</p>
+          <Link href="/" className="px-8 py-3 bg-primary text-primary-foreground font-black rounded-xl">
+            Explore Other Stories
+          </Link>
         </div>
       </main>
     );
@@ -106,111 +115,132 @@ export default function StoryPage({ params }: { params: { id: string } }) {
   return (
     <main className="bg-background text-foreground min-h-screen">
       {/* Header */}
-      <header className="border-b border-border sticky top-0 bg-background z-40">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link href="/" className="flex items-center gap-2 text-foreground hover:text-foreground/70 transition-colors">
+      <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-40">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <Link href="/" className="flex items-center gap-2 text-foreground hover:text-foreground/70 transition-colors font-bold">
             <ArrowLeft size={20} />
-            Back to Listing
+            Back
           </Link>
+          <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full">
+            <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-primary">Live Journey</span>
+          </div>
         </div>
       </header>
 
       {/* Story Content */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Profile section */}
-          <div className="border border-border rounded-lg p-8 mb-12">
-            <div className="flex items-start justify-between mb-8">
-              <div>
-                <div className="w-16 h-16 bg-foreground rounded-full mb-4 flex items-center justify-center text-2xl font-bold text-background">
-                  {story.name.charAt(0)}
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          {/* Main Card */}
+          <div className="bg-card border-2 border-border rounded-[2.5rem] overflow-hidden shadow-2xl shadow-primary/5">
+            {/* Profile Header */}
+            <div className="p-8 sm:p-12 border-b border-border space-y-8">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8">
+                <div className="w-32 h-32 rounded-[2rem] bg-foreground flex items-center justify-center text-4xl font-black text-background overflow-hidden border-4 border-border shadow-xl rotate-3 sm:rotate-6 hover:rotate-0 transition-transform duration-500">
+                  {story.avatar ? (
+                    <img src={story.avatar} alt={story.name} className="w-full h-full object-cover" />
+                  ) : (
+                    story.name.charAt(0)
+                  )}
                 </div>
-                <h1 className="text-4xl font-black text-foreground mb-2">{story.name}</h1>
-                <p className="text-foreground/60 text-sm">
-                  Joined {new Date(story.created_at).toLocaleDateString()}
-                </p>
+
+                <div className="flex-1 text-center sm:text-left space-y-4">
+                  <div>
+                    <h1 className="text-4xl sm:text-6xl font-black text-foreground mb-2 leading-tight">{story.name}</h1>
+                    <p className="inline-flex items-center gap-2 px-4 py-1.5 bg-muted border border-border rounded-full text-foreground/60 text-xs font-black uppercase tracking-wider">
+                      Transitioned {new Date(story.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap justify-center sm:justify-start gap-4">
+                    <button
+                      onClick={handleLike}
+                      disabled={isLiking}
+                      className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-black transition-all ${liked
+                          ? 'bg-primary text-primary-foreground scale-105'
+                          : 'bg-muted border border-border text-foreground hover:border-primary/50'
+                        }`}
+                    >
+                      <Heart size={20} className={liked ? 'fill-current' : ''} />
+                      <span>{currentLikes} {currentLikes === 1 ? 'Like' : 'Likes'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(window.location.href);
+                        alert('Link copied to clipboard!');
+                      }}
+                      className="px-6 py-3 bg-muted border border-border text-foreground font-black rounded-2xl hover:bg-card transition-all"
+                    >
+                      Share Story
+                    </button>
+                  </div>
+                </div>
               </div>
-              <button
-                onClick={handleLike}
-                disabled={isLiking}
-                className="flex-shrink-0 p-4 rounded-full hover:bg-foreground/10 transition-colors disabled:opacity-50"
-              >
-                <Heart
-                  size={32}
-                  className={`transition-all duration-300 ${
-                    liked
-                      ? 'fill-foreground stroke-foreground'
-                      : 'stroke-foreground/40 hover:stroke-foreground'
-                  }`}
-                />
-              </button>
+
+              {/* Quick Transition View */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-4 py-8 border-t border-b border-border/50">
+                <div className="text-center sm:text-right">
+                  <p className="text-[10px] font-black text-foreground/40 uppercase tracking-widest mb-1">Previously</p>
+                  <p className="text-xl font-black text-foreground/80">{story.before}</p>
+                </div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                    <ArrowLeft size={24} className="rotate-180" />
+                  </div>
+                </div>
+                <div className="text-center sm:text-left">
+                  <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">Now</p>
+                  <p className="text-xl font-black text-foreground italic underline decoration-primary decoration-4 underline-offset-4">{story.after}</p>
+                </div>
+              </div>
             </div>
 
-            {/* Career transition */}
-            <div className="space-y-6">
-              {/* Before */}
-              <div className="bg-muted p-6 rounded-lg">
-                <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-2">
-                  Used to do:
-                </p>
-                <p className="text-lg font-bold text-foreground">{story.before}</p>
-              </div>
+            {/* Long Story Section */}
+            <div className="p-8 sm:p-12 bg-muted/30">
+              <div className="max-w-2xl mx-auto space-y-8">
+                <div className="flex items-center gap-4">
+                  <div className="h-px flex-1 bg-border" />
+                  <h2 className="text-center text-xs font-black text-foreground/30 uppercase tracking-[0.4em] whitespace-nowrap">Behind the Screen</h2>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
 
-              {/* Arrow */}
-              <div className="flex items-center justify-center">
-                <div className="h-px flex-grow bg-foreground/20"></div>
-                <span className="mx-4 font-bold text-foreground">↓</span>
-                <div className="h-px flex-grow bg-foreground/20"></div>
-              </div>
+                <div className="prose prose-invert max-w-none">
+                  {story.story ? (
+                    <div className="text-xl sm:text-2xl font-medium text-foreground/90 leading-relaxed space-y-6">
+                      {story.story.split('\n').map((para, i) => (
+                        <p key={i}>{para}</p>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <p className="text-foreground/40 italic font-medium">
+                        {(story.name.split(' ')[0] || 'This dev')} hasn&apos;t shared their full story yet, but their transition from {story.before} to {story.after} speaks for itself.
+                      </p>
+                    </div>
+                  )}
+                </div>
 
-              {/* After */}
-              <div className="bg-muted p-6 rounded-lg">
-                <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-2">
-                  Now doing:
-                </p>
-                <p className="text-lg font-bold text-foreground">{story.after}</p>
+                <div className="pt-12 flex justify-center">
+                  <div className="inline-flex flex-col items-center gap-2">
+                    <p className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">End of story</p>
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* Like stats */}
-            <div className="mt-8 pt-8 border-t border-border flex items-center gap-3">
-              <Heart size={20} className="fill-foreground stroke-foreground" />
-              <span className="text-lg font-semibold text-foreground">
-                {currentLikes} {currentLikes === 1 ? 'person has' : 'people have'} appreciated this story
-              </span>
-            </div>
-          </div>
-
-          {/* Like button section */}
-          <div className="text-center mb-12">
-            <p className="text-foreground/70 text-sm mb-4">
-              {liked ? 'You appreciate this story' : 'Appreciate this story (once per device)'}
-            </p>
-            <button
-              onClick={handleLike}
-              disabled={isLiking}
-              className="px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-colors disabled:opacity-50"
-            >
-              {liked ? 'Unlike' : 'Like This Story'}
-            </button>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-background py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-foreground/70 text-sm">
-            Built with love by{' '}
-            <a
-              href="https://preciousadedokun.com.ng"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold text-foreground hover:underline transition-colors"
-            >
-              Precious Adedokun
-            </a>
-          </p>
+      {/* Sharing footer */}
+      <footer className="py-24 text-center">
+        <div className="max-w-xl mx-auto px-4">
+          <h3 className="text-2xl font-black mb-6">Are you also an ex-dev?</h3>
+          <p className="text-foreground/60 mb-8 font-medium">Join thousands of others in celebrating the life after code. Your story matters.</p>
+          <Link href="/" className="inline-block px-10 py-4 bg-foreground text-background font-black rounded-2xl hover:scale-105 transition-transform">
+            Register Your Journey
+          </Link>
         </div>
       </footer>
     </main>

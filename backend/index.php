@@ -50,6 +50,15 @@ switch ($action) {
     case 'register':
         handleRegister();
         break;
+    case 'login':
+        handleLogin();
+        break;
+    case 'update-profile':
+        handleUpdateProfile();
+        break;
+    case 'upload-avatar':
+        handleUploadAvatar();
+        break;
     case 'like':
         handleLike();
         break;
@@ -64,12 +73,152 @@ switch ($action) {
         echo json_encode(['error' => 'Endpoint not found']);
 }
 
-// Get all people with like counts
+// Login handle
+function handleLogin() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['error' => 'Method not allowed']);
+        return;
+    }
+    
+    $input = json_decode(file_get_contents('php://input'), true);
+    $name = isset($input['name']) ? trim($input['name']) : null;
+    $pin = isset($input['pin']) ? trim($input['pin']) : null;
+    
+    if (!$name || !$pin) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Name and PIN are required']);
+        return;
+    }
+    
+    $data = readData();
+    foreach ($data['people'] as $person) {
+        if (strtolower($person['name']) === strtolower($name)) {
+            if (password_verify($pin, $person['pin'])) {
+                // Return person data without PIN
+                $safePerson = $person;
+                unset($safePerson['pin']);
+                echo json_encode(['success' => true, 'data' => $safePerson]);
+                return;
+            }
+        }
+    }
+    
+    http_response_code(401);
+    echo json_encode(['error' => 'Invalid name or PIN']);
+}
+
+// Update profile handle
+function handleUpdateProfile() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['error' => 'Method not allowed']);
+        return;
+    }
+    
+    $input = json_decode(file_get_contents('php://input'), true);
+    $id = isset($input['id']) ? $input['id'] : null;
+    $pin = isset($input['pin']) ? $input['pin'] : null;
+    
+    if (!$id || !$pin) {
+        http_response_code(400);
+        echo json_encode(['error' => 'ID and PIN are required']);
+        return;
+    }
+    
+    $data = readData();
+    foreach ($data['people'] as &$person) {
+        if ($person['id'] === $id) {
+            if (password_verify($pin, $person['pin'])) {
+                if (isset($input['name'])) $person['name'] = htmlspecialchars($input['name']);
+                if (isset($input['before'])) $person['before'] = htmlspecialchars($input['before']);
+                if (isset($input['after'])) $person['after'] = htmlspecialchars($input['after']);
+                if (isset($input['story'])) $person['story'] = htmlspecialchars($input['story']);
+                if (isset($input['avatar'])) $person['avatar'] = $input['avatar'];
+                
+                writeData($data);
+                
+                $safePerson = $person;
+                unset($safePerson['pin']);
+                echo json_encode(['success' => true, 'data' => $safePerson]);
+                return;
+            } else {
+                http_response_code(401);
+                echo json_encode(['error' => 'Invalid PIN']);
+                return;
+            }
+        }
+    }
+    
+    http_response_code(404);
+    echo json_encode(['error' => 'Profile not found']);
+}
+
+// Simple avatar upload (base64 for simplicity in this JSON setup, or file if possible)
+function handleUploadAvatar() {
+    // For now, we'll let the frontend handle base64 encoding or external URLs
+    // But if we want to support file uploads:
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['error' => 'Method not allowed']);
+        return;
+    }
+
+    if (!isset($_FILES['avatar'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'No file uploaded']);
+        return;
+    }
+
+    $file = $_FILES['avatar'];
+    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $filename = 'avatar_' . uniqid() . '.' . $ext;
+    $uploadDir = __DIR__ . '/../public/uploads/';
+    
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+
+    if (move_uploaded_file($file['tmp_name'], $uploadDir . $filename)) {
+        echo json_encode(['success' => true, 'url' => '/uploads/' . $filename]);
+    } else {
+        http_response_code(500);
+        echo json_encode(['error' => 'Failed to move uploaded file']);
+    }
+}
+
+// Get all people with like counts (paginated & cached)
 function handleGetAll() {
+    global $dataFile;
+    
+    // Simple ETag caching based on file modification time
+    $lastModified = file_exists($dataFile) ? filemtime($dataFile) : time();
+    $etag = md5($lastModified . $dataFile);
+    
+    header("ETag: $etag");
+    header("Cache-Control: public, max-age=60"); // Cache for 60 seconds
+    
+    if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) === $etag) {
+        http_response_code(304);
+        exit;
+    }
+
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 25;
+    $offset = ($page - 1) * $limit;
+
     $data = readData();
     
-    $people = [];
-    foreach ($data['people'] as $person) {
+    // Sort people by creation date (newest first)
+    usort($data['people'], function($a, $b) {
+        return strtotime($b['created_at']) - strtotime($a['created_at']);
+    });
+
+    $total = count($data['people']);
+    $paginatedPeople = array_slice($data['people'], $offset, $limit);
+    
+    $result = [];
+    foreach ($paginatedPeople as $person) {
         $likeCount = 0;
         foreach ($data['likes'] as $like) {
             if ($like['person_id'] === $person['id']) {
@@ -77,10 +226,20 @@ function handleGetAll() {
             }
         }
         $person['likes'] = $likeCount;
-        $people[] = $person;
+        unset($person['pin']); // Always ensure PIN is hidden
+        $result[] = $person;
     }
     
-    echo json_encode(['success' => true, 'data' => $people]);
+    echo json_encode([
+        'success' => true, 
+        'data' => $result,
+        'pagination' => [
+            'total' => $total,
+            'page' => $page,
+            'limit' => $limit,
+            'total_pages' => ceil($total / $limit)
+        ]
+    ]);
 }
 
 // Get single story
@@ -140,6 +299,8 @@ function handleRegister() {
         'name' => htmlspecialchars($input['name']),
         'before' => htmlspecialchars($input['before']),
         'after' => htmlspecialchars($input['after']),
+        'story' => isset($input['story']) ? htmlspecialchars($input['story']) : '',
+        'avatar' => isset($input['avatar']) ? $input['avatar'] : null,
         'pin' => password_hash($pin, PASSWORD_DEFAULT),
         'created_at' => date('Y-m-d H:i:s')
     ];

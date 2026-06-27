@@ -365,12 +365,35 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-muted p-4 rounded-2xl border border-border/50">
                   <p className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-1">Total Likes</p>
-                  <p className="text-3xl font-black text-foreground">{user.likes || 0}</p>
+                  <p className="text-3xl font-black text-foreground">{user.likes ?? 0}</p>
                 </div>
                 <div className="bg-muted p-4 rounded-2xl border border-border/50">
                   <p className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-1">Status</p>
                   <p className="text-3xl font-black text-primary">Live</p>
                 </div>
+              </div>
+
+              {/* Quick Links */}
+              <div className="flex gap-3">
+                <a
+                  href={`/story/${user.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-3 bg-muted hover:bg-border border border-border text-foreground font-bold rounded-xl text-center text-sm transition-all"
+                >
+                  View My Story →
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const shareUrl = `${window.location.origin}/story/${user.id}`;
+                    navigator.clipboard.writeText(shareUrl);
+                    toast.success('Story link copied! 🔗');
+                  }}
+                  className="px-4 py-3 bg-muted hover:bg-border border border-border text-foreground font-bold rounded-xl text-sm transition-all"
+                >
+                  Copy Link
+                </button>
               </div>
 
               <form onSubmit={handleUpdate} className="space-y-6">
@@ -520,17 +543,6 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
                   >
                     {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
                     <span>Save Changes</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const shareUrl = `${window.location.origin}/story/${user.id}`;
-                      navigator.clipboard.writeText(shareUrl);
-                      toast.success('Story link copied! 🔗');
-                    }}
-                    className="px-6 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-xl border border-border transition-all flex items-center justify-center"
-                  >
-                    Share
                   </button>
                 </div>
               </form>

@@ -3,6 +3,7 @@
 import { useState, useEffect, use, type ReactNode } from 'react';
 import { Heart, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 interface Story {
   id: string;
@@ -137,7 +138,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
         setLiked(!liked);
         setCurrentLikes(data.likes);
       } else if (response.status === 400) {
-        alert(data.error || 'You have already liked this story');
+        toast.error(data.error || 'You\'ve already liked this story');
       }
     } catch (error) {
       console.error('Error liking story:', error);
@@ -235,7 +236,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
                     <button
                       onClick={() => {
                         navigator.clipboard.writeText(window.location.href);
-                        alert('Link copied to clipboard!');
+                        toast.success('Link copied to clipboard! 🔗');
                       }}
                       className="px-6 py-3 bg-muted border border-border text-foreground font-black rounded-2xl hover:bg-card transition-all"
                     >

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Camera, Save, LogOut, Loader2, Sparkles, User, MessageSquareText, Award } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface RegisterModalProps {
   mode?: 'register' | 'login';
@@ -106,13 +107,15 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
 
     try {
       const pin = localStorage.getItem('iwasadev_pin');
+      // Exclude pin from formData to avoid overwriting the stored PIN
+      const { pin: _unusedPin, ...profileData } = formData;
       const response = await fetch(`${API_BASE}/update-profile`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: user.id,
           pin,
-          ...formData,
+          ...profileData,
           avatar
         }),
       });
@@ -122,7 +125,7 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
         localStorage.setItem('iwasadev_user', JSON.stringify(data.data));
         setUser(data.data);
         onSuccess?.(data.data);
-        alert('Profile updated successfully!');
+        toast.success('Profile updated! 🎉');
       } else {
         setError(data.error || 'Update failed');
       }
@@ -336,7 +339,7 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(generatedPin);
-                    alert('PIN copied to clipboard!');
+                    toast.success('PIN copied to clipboard! 🔐');
                   }}
                   className="w-full py-4 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-xl transition-all border border-border"
                 >
@@ -523,7 +526,7 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
                     onClick={() => {
                       const shareUrl = `${window.location.origin}/story/${user.id}`;
                       navigator.clipboard.writeText(shareUrl);
-                      alert('Story link copied to clipboard!');
+                      toast.success('Story link copied! 🔗');
                     }}
                     className="px-6 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-xl border border-border transition-all flex items-center justify-center"
                   >

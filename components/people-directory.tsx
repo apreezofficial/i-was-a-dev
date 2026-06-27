@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import PersonCard from './person-card';
 
 interface Person {
@@ -120,7 +121,7 @@ export default function PeopleDirectory() {
           )
         );
       } else if (response.status === 400) {
-        alert(data.error || 'You have already liked this story');
+        toast.error(data.error || 'You\'ve already liked this story');
       }
     } catch (error) {
       console.error('Error liking story:', error);

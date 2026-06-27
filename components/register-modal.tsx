@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Camera, Save, LogOut, Loader2, Sparkles, User, MessageSquareText, Award } from 'lucide-react';
+import { X, Camera, Save, LogOut, Loader2, Sparkles, User, MessageSquareText, Award, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface RegisterModalProps {
@@ -28,6 +28,8 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
   const [error, setError] = useState('');
   const [user, setUser] = useState<any>(null);
   const [storyView, setStoryView] = useState<'edit' | 'preview'>('edit');
+  const [liked, setLiked] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('iwasadev_user');
@@ -43,8 +45,27 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
       });
       setAvatar(parsedUser.avatar || null);
       setCurrentStep('dashboard');
+      checkLikeStatus(parsedUser.id);
     }
   }, [mode]);
+
+  const checkLikeStatus = async (userId: string) => {
+    try {
+      const response = await fetch(`${API_BASE}/check-like?person_id=${userId}`);
+      const data = await response.json();
+      setLiked(data.liked || false);
+
+      // Also refresh user data while at it
+      const storyResponse = await fetch(`${API_BASE}/get-story?id=${userId}`);
+      const storyData = await storyResponse.json();
+      if (storyData.success) {
+        setUser(storyData.data);
+        localStorage.setItem('iwasadev_user', JSON.stringify(storyData.data));
+      }
+    } catch (err) {
+      console.error('Error checking like status:', err);
+    }
+  };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -155,6 +176,35 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
       textarea.focus();
       textarea.setSelectionRange(start + prefix.length, end + prefix.length);
     }, 0);
+  };
+
+  const handleLike = async () => {
+    if (!user || isLiking) return;
+    setIsLiking(true);
+
+    try {
+      const endpoint = liked ? 'unlike' : 'like';
+      const response = await fetch(`${API_BASE}/${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ person_id: user.id }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setLiked(!liked);
+        const updatedUser = { ...user, likes: data.likes };
+        setUser(updatedUser);
+        localStorage.setItem('iwasadev_user', JSON.stringify(updatedUser));
+        toast.success(liked ? 'Story unliked' : 'Story liked! ❤️');
+      } else {
+        toast.error(data.error || 'Operation failed');
+      }
+    } catch (err) {
+      toast.error('Error connecting to server');
+    } finally {
+      setIsLiking(false);
+    }
   };
 
   const handleInputChange = (
@@ -363,9 +413,21 @@ export default function RegisterModal({ mode = 'register', onClose, onSuccess }:
             <div className="space-y-8">
               {/* Stats / Dashboard Overview */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-muted p-4 rounded-2xl border border-border/50">
-                  <p className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-1">Total Likes</p>
-                  <p className="text-3xl font-black text-foreground">{user.likes ?? 0}</p>
+                <div className="bg-muted p-4 rounded-2xl border border-border/50 flex items-center justify-between group">
+                  <div>
+                    <p className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-1">Total Likes</p>
+                    <p className="text-3xl font-black text-foreground">{user.likes ?? 0}</p>
+                  </div>
+                  <button
+                    onClick={handleLike}
+                    disabled={isLiking}
+                    className={`p-3 rounded-xl transition-all duration-300 ${liked
+                        ? 'bg-primary/20 text-primary scale-110 shadow-lg shadow-primary/20'
+                        : 'bg-background/50 text-foreground/20 hover:text-foreground/40 hover:scale-105'
+                      }`}
+                  >
+                    <Heart size={24} className={isLiking ? 'animate-pulse' : ''} fill={liked ? 'currentColor' : 'none'} />
+                  </button>
                 </div>
                 <div className="bg-muted p-4 rounded-2xl border border-border/50">
                   <p className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-1">Status</p>

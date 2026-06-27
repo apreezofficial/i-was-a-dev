@@ -1,71 +1,272 @@
 {
   "people": [
     {
-      "id": "dev_001",
-      "name": "Sarah Chen",
-      "before": "Full-Stack Developer (10 yrs)",
-      "after": "Product Manager @ Tech Startup",
-      "story": "I spent a decade debugging code until I realized my true passion was debugging business problems. Moving to Product allowed me to stay in tech while focusing on the 'why' instead of the 'how'. It was the best decision of my life.",
-      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-      "pin": "$2y$10$placeholder1",
-      "created_at": "2024-01-15 10:30:00"
+      "id": "dev_6a357bd0dff3a",
+      "name": "Precious Adedokun",
+      "before": "Full Stack Feveloper and Seo guy",
+      "after": "Plumber and POS Operator",
+      "story": "# Why I left\nI no know why sef, *testing markdown btw*",
+      "pin": "$2y$10$GbGtG3TrEJjfApZo/1Jwt.hRqXX4sDDvVaPowZxkGuZ994c3kWtcO",
+      "created_at": "2026-06-19 17:26:40"
     },
     {
-      "id": "dev_002",
-      "name": "Marcus Johnson",
-      "before": "Backend Engineer",
-      "after": "Founder - SaaS Company",
-      "story": "Coding was my foundation, but building a company is my legacy. I still write some code for my startup, but most of my days are spent on growth, strategy, and people.",
-      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus",
-      "pin": "$2y$10$placeholder2",
-      "created_at": "2024-01-14 14:22:00"
+      "id": "dev_6a3e54a73f035",
+      "name": "SliqCodes",
+      "before": "Full Stack Developer",
+      "after": "Student \ud83d\ude2a",
+      "pin": "$2y$10$8pUXnkJiviaY5NSSKrsR6e0XySM30PSq4BY3VslmiVJO/yb/MKSB6",
+      "created_at": "2026-06-26 10:29:59"
     },
     {
-      "id": "dev_003",
-      "name": "Elena Rodriguez",
-      "before": "React Developer",
-      "after": "UX Designer & Design Lead",
-      "story": "I used to implement designs, now I create them. My background in React makes me a better designer because I understand the constraints of the browser.",
-      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Elena",
-      "pin": "$2y$10$placeholder3",
-      "created_at": "2024-01-13 09:15:00"
+      "id": "dev_6a3e55ff1d9d3",
+      "name": "Ibrahim",
+      "before": "Uiux Designer",
+      "after": "Jobless \ud83d\udc94",
+      "pin": "$2y$10$tzb24JOJUP6Zz.lTfYAT4.05JSu2Fk04CKBgzoJwuwTZEaEVA9NVW",
+      "created_at": "2026-06-26 10:35:43"
     },
     {
-      "id": "dev_004",
-      "name": "David Kim",
-      "before": "DevOps Engineer",
-      "after": "Solutions Architect",
-      "story": "Monitoring pipelines was fun, but designing entire architectures is where the real magic happens.",
-      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
-      "pin": "$2y$10$placeholder4",
-      "created_at": "2024-01-12 16:45:00"
+      "id": "dev_6a3e563f531df",
+      "name": "Klintech ",
+      "before": "Frontend Developer ",
+      "after": "Jobless \ud83d\udc94",
+      "pin": "$2y$10$w8StRLl9ZADOArVSiKWg8ezu.WHQt08s5awDTNHmU1LjUaj.HNtx2",
+      "created_at": "2026-06-26 10:36:47"
     },
     {
-      "id": "dev_005",
-      "name": "Sophie Laurent",
-      "before": "Frontend Developer",
-      "after": "Content Creator & Tech Writer",
-      "story": "I loved the frontend, but I loved explaining it even more. Now I help thousands of devs learn through my articles and videos.",
-      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie",
-      "pin": "$2y$10$placeholder5",
-      "created_at": "2024-01-11 11:20:00"
+      "id": "dev_6a3e56632380f",
+      "name": "Falade Ayomide",
+      "before": "Frontend End Developer and Graphic Designer",
+      "after": "Farmer",
+      "pin": "$2y$10$kKYFwMxKCgktlNklLqvnj.evwFOvCLkDDQbSOYgRZTAkS6Bt3Y4Qm",
+      "created_at": "2026-06-26 10:37:23"
     },
     {
-      "id": "dev_006",
-      "name": "James Wilson",
-      "before": "Senior Developer",
-      "after": "Business Consultant",
-      "story": "Software is just a tool for business. I now help companies optimize their entire workflow, not just their code.",
-      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=James",
-      "pin": "$2y$10$placeholder6",
-      "created_at": "2024-01-10 13:50:00"
+      "id": "dev_6a3e6026932f3",
+      "name": "Hero",
+      "before": "Fullstack software engineer",
+      "after": "Yahoo Boy ",
+      "pin": "$2y$10$GHEL1G3r2ow.8bJPFTZi/uitdZWa26Slt0EZxY.FjdPsAveABxmK2",
+      "created_at": "2026-06-26 11:19:02"
+    },
+    {
+      "id": "dev_6a3e7a366c36c",
+      "name": "Ahmad Ibrahim",
+      "before": "Fullstack Developer ",
+      "after": "Owner of SpaceX \ud83d\ude01",
+      "pin": "$2y$10$sL1fqYwCo4nK16FYQ81plOsPtdkYYNf/fVNnZ8PX1vS680vozH2p6",
+      "created_at": "2026-06-26 13:10:14"
+    },
+    {
+      "id": "dev_6a3ec3ae37854",
+      "name": "Unknown ",
+      "before": "Porn star ",
+      "after": "Prime minister of Faroe Island",
+      "pin": "$2y$10$2gDnNA10Gog5osp5hTSBQuClTb3VF/k9Az8H.NKGnFcSo3jgNKVmm",
+      "created_at": "2026-06-26 18:23:42"
+    },
+    {
+      "id": "dev_6a3ec5f174d39",
+      "name": "Abubakar Ibrahim ",
+      "before": "Full Stark Dev since 2023",
+      "after": "Pickpocketing ",
+      "pin": "$2y$10$8J0RKncr6VJQXrtdav7Ah.GInhUurNnoo/QDHXEQuzi..oDEnIdRu",
+      "created_at": "2026-06-26 18:33:21"
+    },
+    {
+      "id": "dev_6a3ec5fdc45f2",
+      "name": "Sara chen",
+      "before": "Was a software engineer ",
+      "after": "I sell carrot ",
+      "pin": "$2y$10$l1kboEwhVTmeYHFfG.U13OF/Cf.jltxg6.aZZSphQYfkCYnI7hfC.",
+      "created_at": "2026-06-26 18:33:33"
+    },
+    {
+      "id": "dev_6a3ed577eadeb",
+      "name": "Folarin Ayobami",
+      "before": "Full-Stack Developer (3yrs+)",
+      "after": "Content Creator ",
+      "pin": "$2y$10$dQZJChLMGV8gc4WX2xGPl.VZYuLq0iXIwt7mpV/BHPAhUppND01ZG",
+      "created_at": "2026-06-26 19:39:36"
+    },
+    {
+      "id": "dev_6a3edacd65bfb",
+      "name": "Alex",
+      "before": "Software engineer ",
+      "after": "The last of my kind \nSoftware engineer \nFounder alex-stories\nhttps://alex-stories.vercel.app/\nI no follow una give up",
+      "pin": "$2y$10$Bt5nkviFLz1WrQyLWfS5W.1kkrR3PcrG5zAKjpJ5kGbm6DQAOCcnO",
+      "created_at": "2026-06-26 20:02:21"
+    },
+    {
+      "id": "dev_6a3ef625ac186",
+      "name": "Coolerputt",
+      "before": "FullStack engineer",
+      "after": "Entrepreneur",
+      "pin": "$2y$10$LfoCPhMT9Kr5RN4kIV6xA.5Kt9rRExH9lwQkcQHf/D7ccbv19gJGG",
+      "created_at": "2026-06-26 21:59:01"
+    },
+    {
+      "id": "dev_6a3fb798b0d5d",
+      "name": "Furqooncode ",
+      "before": "Frontend developer ",
+      "after": "Fullstack dev ",
+      "pin": "$2y$10$6jFQjObXNhR5uPLhSrWcTOOF75onb0SAJZkrzLxUVYNgbD3nEszg2",
+      "created_at": "2026-06-27 11:44:24"
+    },
+    {
+      "id": "dev_6a3fc1333423d",
+      "name": "Ese",
+      "before": "Product designer",
+      "after": "Entrepreneur ",
+      "pin": "$2y$10$27aPTejmLRkiHTxxpPS5de3jyVY660.BwSi7twq7Lbj8Fo96ivhLa",
+      "created_at": "2026-06-27 12:25:23"
     }
   ],
   "likes": [
     {
-      "person_id": "dev_001",
-      "device": "device_hash_1",
-      "liked_at": "2024-01-15 10:35:00"
+      "person_id": "dev_6a357bd0dff3a",
+      "device": "7faab783db0cfd7175e318f3975fd144263b1270f8ce0b386da709781783e7ad",
+      "liked_at": "2026-06-19 17:27:05"
+    },
+    {
+      "person_id": "dev_6a357bd0dff3a",
+      "device": "0372cdd2771b36b6bb5c8d599f0574d51589791d2772203e919fad1151b41ebf",
+      "liked_at": "2026-06-19 17:27:31"
+    },
+    {
+      "person_id": "dev_6a357bd0dff3a",
+      "device": "83b294146319e7375672e5de6e749390ca7e7fc136e079bac8a700abea1670fc",
+      "liked_at": "2026-06-21 07:35:22"
+    },
+    {
+      "person_id": "dev_6a3e54a73f035",
+      "device": "7959340127ac4969f9fe516901b4ab02ba65b89176942b6f514a534ae66d8840",
+      "liked_at": "2026-06-26 10:34:00"
+    },
+    {
+      "person_id": "dev_6a3e6026932f3",
+      "device": "f3441816a7b8f18badec70be18f0df70d695316e9ece24d0b4035dcd88a0ac54",
+      "liked_at": "2026-06-26 11:19:53"
+    },
+    {
+      "person_id": "dev_6a3e54a73f035",
+      "device": "83b294146319e7375672e5de6e749390ca7e7fc136e079bac8a700abea1670fc",
+      "liked_at": "2026-06-26 18:15:37"
+    },
+    {
+      "person_id": "dev_6a3e55ff1d9d3",
+      "device": "83b294146319e7375672e5de6e749390ca7e7fc136e079bac8a700abea1670fc",
+      "liked_at": "2026-06-26 18:15:40"
+    },
+    {
+      "person_id": "dev_6a3e563f531df",
+      "device": "83b294146319e7375672e5de6e749390ca7e7fc136e079bac8a700abea1670fc",
+      "liked_at": "2026-06-26 18:15:44"
+    },
+    {
+      "person_id": "dev_6a3e56632380f",
+      "device": "83b294146319e7375672e5de6e749390ca7e7fc136e079bac8a700abea1670fc",
+      "liked_at": "2026-06-26 18:15:45"
+    },
+    {
+      "person_id": "dev_6a3e6026932f3",
+      "device": "83b294146319e7375672e5de6e749390ca7e7fc136e079bac8a700abea1670fc",
+      "liked_at": "2026-06-26 18:15:47"
+    },
+    {
+      "person_id": "dev_6a3e7a366c36c",
+      "device": "83b294146319e7375672e5de6e749390ca7e7fc136e079bac8a700abea1670fc",
+      "liked_at": "2026-06-26 18:15:48"
+    },
+    {
+      "person_id": "dev_6a357bd0dff3a",
+      "device": "4c19d93ed8cdc901b0d89ce3877ad194e5d4605dac856431a1a343d16b7a3eee",
+      "liked_at": "2026-06-26 18:32:17"
+    },
+    {
+      "person_id": "dev_6a357bd0dff3a",
+      "device": "01faa6fe4f1c2c10f90851031a4f0fb809af150c94a895e2d270a6fdee788f55",
+      "liked_at": "2026-06-26 18:33:56"
+    },
+    {
+      "person_id": "dev_6a357bd0dff3a",
+      "device": "62ff5fd3f66550c732dbd10b86fb6f8960ddce4305c45c0856d02c37a2378847",
+      "liked_at": "2026-06-26 18:36:06"
+    },
+    {
+      "person_id": "dev_6a3e54a73f035",
+      "device": "62ff5fd3f66550c732dbd10b86fb6f8960ddce4305c45c0856d02c37a2378847",
+      "liked_at": "2026-06-26 18:36:12"
+    },
+    {
+      "person_id": "dev_6a3e55ff1d9d3",
+      "device": "62ff5fd3f66550c732dbd10b86fb6f8960ddce4305c45c0856d02c37a2378847",
+      "liked_at": "2026-06-26 18:36:15"
+    },
+    {
+      "person_id": "dev_6a3e56632380f",
+      "device": "62ff5fd3f66550c732dbd10b86fb6f8960ddce4305c45c0856d02c37a2378847",
+      "liked_at": "2026-06-26 18:36:21"
+    },
+    {
+      "person_id": "dev_6a3e6026932f3",
+      "device": "62ff5fd3f66550c732dbd10b86fb6f8960ddce4305c45c0856d02c37a2378847",
+      "liked_at": "2026-06-26 18:36:31"
+    },
+    {
+      "person_id": "dev_6a3ec5f174d39",
+      "device": "4c19d93ed8cdc901b0d89ce3877ad194e5d4605dac856431a1a343d16b7a3eee",
+      "liked_at": "2026-06-26 19:37:25"
+    },
+    {
+      "person_id": "dev_6a3e54a73f035",
+      "device": "2c78e54dd0ff5bbe5234c828090cefb941708aac21eeac1ba11ec6efcbe9fe51",
+      "liked_at": "2026-06-26 19:40:26"
+    },
+    {
+      "person_id": "dev_6a3e6026932f3",
+      "device": "2c78e54dd0ff5bbe5234c828090cefb941708aac21eeac1ba11ec6efcbe9fe51",
+      "liked_at": "2026-06-26 19:41:13"
+    },
+    {
+      "person_id": "dev_6a357bd0dff3a",
+      "device": "11d8a2f02f0f0a9a56226e2afcd023f71930ee2bdb0335025b3e5c78e761bec8",
+      "liked_at": "2026-06-26 22:00:13"
+    },
+    {
+      "person_id": "dev_6a3e54a73f035",
+      "device": "11d8a2f02f0f0a9a56226e2afcd023f71930ee2bdb0335025b3e5c78e761bec8",
+      "liked_at": "2026-06-26 22:00:17"
+    },
+    {
+      "person_id": "dev_6a3e55ff1d9d3",
+      "device": "11d8a2f02f0f0a9a56226e2afcd023f71930ee2bdb0335025b3e5c78e761bec8",
+      "liked_at": "2026-06-26 22:00:20"
+    },
+    {
+      "person_id": "dev_6a3edacd65bfb",
+      "device": "11d8a2f02f0f0a9a56226e2afcd023f71930ee2bdb0335025b3e5c78e761bec8",
+      "liked_at": "2026-06-26 22:00:58"
+    },
+    {
+      "person_id": "dev_6a3ef625ac186",
+      "device": "11d8a2f02f0f0a9a56226e2afcd023f71930ee2bdb0335025b3e5c78e761bec8",
+      "liked_at": "2026-06-26 22:00:59"
+    },
+    {
+      "person_id": "dev_6a357bd0dff3a",
+      "device": "3fcb8aea9b969fe56c65069fe35133e683764a59e3d764a204bd1339fc1c592e",
+      "liked_at": "2026-06-26 22:01:59"
+    },
+    {
+      "person_id": "dev_6a357bd0dff3a",
+      "device": "a40e0e9640877ab71effbd4fbc6cc1f2f80d070b5ac027673bb14e4a0f787e32",
+      "liked_at": "2026-06-27 12:24:02"
+    },
+    {
+      "person_id": "dev_6a3e55ff1d9d3",
+      "device": "a40e0e9640877ab71effbd4fbc6cc1f2f80d070b5ac027673bb14e4a0f787e32",
+      "liked_at": "2026-06-27 12:24:08"
     }
   ]
 }

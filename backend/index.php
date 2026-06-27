@@ -261,6 +261,8 @@ function handleGetAll() {
 function handleGetStory() {
     $id = isset($_GET['id']) ? $_GET['id'] : null;
     
+    // Debug: error_log("Requesting ID: " . $id);
+    
     if (!$id) {
         http_response_code(400);
         echo json_encode(['error' => 'ID is required']);
@@ -268,9 +270,10 @@ function handleGetStory() {
     }
     
     $data = readData();
+    // Debug: error_log("Data count: " . count($data['people']));
     
     foreach ($data['people'] as $person) {
-        if ($person['id'] === $id) {
+        if (trim($person['id']) === trim($id)) {
             $likeCount = 0;
             foreach ($data['likes'] as $like) {
                 if ($like['person_id'] === $person['id']) {
@@ -278,6 +281,7 @@ function handleGetStory() {
                 }
             }
             $person['likes'] = $likeCount;
+            unset($person['pin']); // Security: Remove hashed PIN
             echo json_encode(['success' => true, 'data' => $person]);
             return;
         }

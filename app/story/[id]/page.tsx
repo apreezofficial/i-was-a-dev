@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { Heart, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -17,7 +17,8 @@ interface Story {
 
 const API_BASE = 'https://api.preciousadedokun.com.ng/iwasadev';
 
-export default function StoryPage({ params }: { params: { id: string } }) {
+export default function StoryPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [story, setStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,9 +27,10 @@ export default function StoryPage({ params }: { params: { id: string } }) {
   const [isLiking, setIsLiking] = useState(false);
 
   useEffect(() => {
+    if (!id) return;
     const fetchStory = async () => {
       try {
-        const response = await fetch(`${API_BASE}/get-story?id=${params.id}`);
+        const response = await fetch(`${API_BASE}/get-story?id=${id}`);
         const data = await response.json();
 
         if (data.success) {
@@ -37,7 +39,7 @@ export default function StoryPage({ params }: { params: { id: string } }) {
 
           // Check if already liked
           const likeCheckResponse = await fetch(
-            `${API_BASE}/check-like?person_id=${params.id}`
+            `${API_BASE}/check-like?person_id=${id}`
           );
           const likeData = await likeCheckResponse.json();
           setLiked(likeData.liked || false);
@@ -53,7 +55,7 @@ export default function StoryPage({ params }: { params: { id: string } }) {
     };
 
     fetchStory();
-  }, [params.id]);
+  }, [id]);
 
   const handleLike = async () => {
     setIsLiking(true);

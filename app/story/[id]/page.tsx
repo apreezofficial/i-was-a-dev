@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, type ReactNode } from 'react';
 import { Heart, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -16,6 +16,71 @@ interface Story {
 }
 
 const API_BASE = 'https://api.preciousadedokun.com.ng/iwasadev';
+
+// Inline markdown renderer: handles **bold**, *italic*, `code`, [link](url)
+function renderInline(text: string): ReactNode[] {
+  const parts: ReactNode[] = [];
+  // Combined regex for bold, italic, inline code, links
+  const regex = /(\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`|\[(.+?)\]\((.+?)\))/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    // Push preceding plain text
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+
+    if (match[2] !== undefined) {
+      // **bold**
+      parts.push(<strong key={match.index} className="font-black text-foreground">{match[2]}</strong>);
+    } else if (match[3] !== undefined) {
+      // *italic*
+      parts.push(<em key={match.index} className="italic text-foreground/80">{match[3]}</em>);
+    } else if (match[4] !== undefined) {
+      // `code`
+      parts.push(<code key={match.index} className="px-1.5 py-0.5 bg-muted rounded text-sm font-mono text-primary">{match[4]}</code>);
+    } else if (match[5] !== undefined && match[6] !== undefined) {
+      // [link](url)
+      parts.push(<a key={match.index} href={match[6]} target="_blank" rel="noopener noreferrer" className="underline decoration-primary text-primary hover:opacity-80 transition-opacity">{match[5]}</a>);
+    }
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Push remaining plain text
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts;
+}
+
+// Full story markdown renderer
+function StoryMarkdown({ content }: { content: string }) {
+  const lines = content.split('\n');
+
+  return (
+    <div className="space-y-4">
+      {lines.map((line, i) => {
+        if (line.startsWith('# '))
+          return <h1 key={i} className="text-4xl font-black mb-2 mt-8 text-foreground">{renderInline(line.slice(2))}</h1>;
+        if (line.startsWith('## '))
+          return <h2 key={i} className="text-3xl font-black mb-2 mt-6 text-foreground/90">{renderInline(line.slice(3))}</h2>;
+        if (line.startsWith('### '))
+          return <h3 key={i} className="text-2xl font-black mb-2 mt-4 text-foreground/80">{renderInline(line.slice(4))}</h3>;
+        if (line.startsWith('> '))
+          return <blockquote key={i} className="border-l-4 border-primary pl-6 italic my-6 text-foreground/60 bg-primary/5 py-4 rounded-r-xl">{renderInline(line.slice(2))}</blockquote>;
+        if (line.startsWith('- '))
+          return <li key={i} className="ml-6 mb-1 list-disc">{renderInline(line.slice(2))}</li>;
+        if (line.trim() === '')
+          return <div key={i} className="h-3" />;
+
+        return <p key={i} className="leading-relaxed">{renderInline(line)}</p>;
+      })}
+    </div>
+  );
+}
 
 export default function StoryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -209,22 +274,8 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
 
                 <div className="prose prose-invert max-w-none">
                   {story.story ? (
-                    <div className="text-xl sm:text-2xl font-medium text-foreground/90 leading-relaxed space-y-6">
-                      {story.story.split('\n').map((line, i) => {
-                        // Simple Markdown Fallback
-                        if (line.startsWith('# '))
-                          return <h1 key={i} className="text-4xl font-black mb-6 mt-8 text-foreground">{line.replace('# ', '')}</h1>;
-                        if (line.startsWith('## '))
-                          return <h2 key={i} className="text-3xl font-black mb-4 mt-6 text-foreground/90">{line.replace('## ', '')}</h2>;
-                        if (line.startsWith('### '))
-                          return <h3 key={i} className="text-2xl font-black mb-3 mt-4 text-foreground/80">{line.replace('### ', '')}</h3>;
-                        if (line.startsWith('> '))
-                          return <blockquote key={i} className="border-l-4 border-primary pl-6 italic my-8 text-foreground/60 bg-primary/5 py-4 rounded-r-xl">{line.replace('> ', '')}</blockquote>;
-                        if (line.startsWith('- '))
-                          return <li key={i} className="ml-6 mb-2 list-disc">{line.replace('- ', '')}</li>;
-
-                        return line.trim() === '' ? <div key={i} className="h-4" /> : <p key={i}>{line}</p>;
-                      })}
+                    <div className="text-lg sm:text-xl font-medium text-foreground/90 leading-relaxed">
+                      <StoryMarkdown content={story.story} />
                     </div>
                   ) : (
                     <div className="text-center py-12">

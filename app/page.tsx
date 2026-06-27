@@ -11,7 +11,7 @@ export default function Home() {
   const [registerMode, setRegisterMode] = useState<'register' | 'login'>('register');
   const [user, setUser] = useState<any>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  
+
   const animatedWords = ['coding', 'building', 'developing', 'creating', 'innovating'];
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function Home() {
       <header className="border-b border-border sticky top-0 bg-background z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-foreground">iwasadev</h1>
-          
+
           <div className="flex items-center gap-4">
             {user ? (
               <div className="relative">
@@ -57,7 +57,7 @@ export default function Home() {
                   <span>Me</span>
                   <ChevronDown size={16} className={`transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
                 </button>
-                
+
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-xl shadow-xl py-2 z-50">
                     <button
@@ -106,7 +106,7 @@ export default function Home() {
       </section>
 
       <PeopleDirectory />
-      
+
       {/* Footer */}
       <footer className="border-t border-border bg-background py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -123,18 +123,29 @@ export default function Home() {
                   Precious Adedokun
                 </a>
               </p>
+              <p className="text-foreground/40 text-sm mt-1">
+                Also checkout{' '}
+                <a
+                  href="https://uselessass.xyz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-foreground/70 hover:text-foreground hover:underline transition-colors"
+                >
+                  uselessass.xyz
+                </a>
+              </p>
             </div>
-            
+
             {!user && (
               <div className="flex gap-4">
-                <button 
+                <button
                   onClick={() => openRegister('login')}
                   className="text-sm font-bold text-foreground/60 hover:text-foreground transition-colors"
                 >
                   Login
                 </button>
                 <span className="text-foreground/20">|</span>
-                <button 
+                <button
                   onClick={() => openRegister('register')}
                   className="text-sm font-bold text-foreground/60 hover:text-foreground transition-colors"
                 >
@@ -147,9 +158,9 @@ export default function Home() {
       </footer>
 
       {showRegister && (
-        <RegisterModal 
-          mode={registerMode} 
-          onClose={() => setShowRegister(false)} 
+        <RegisterModal
+          mode={registerMode}
+          onClose={() => setShowRegister(false)}
           onSuccess={(userData) => {
             setUser(userData);
             setShowRegister(false);
